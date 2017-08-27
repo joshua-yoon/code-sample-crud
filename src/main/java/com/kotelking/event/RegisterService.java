@@ -1,6 +1,7 @@
 package com.kotelking.event;
 
 import com.kotelking.event.config.RepositoryConfig;
+import com.kotelking.event.exception.LimitReachedException;
 import com.kotelking.event.model.Apply;
 import com.kotelking.event.model.User;
 import com.kotelking.event.repository.RegisterRepository;
@@ -32,11 +33,13 @@ public class RegisterService {
     private static final int THREAD_POOL_MAX_SIZE = 24;
     private ThreadPoolTaskExecutor pool;
     private final List<RegisterRepository> registerRepositories;
+    private final RegisterRepository registerRepository;
 
     @Autowired
     public RegisterService(@Qualifier(RepositoryConfig.REPOSITORY_LIST) List<RegisterRepository> registerRepositories){
 
         this.registerRepositories=registerRepositories;
+        this.registerRepository=registerRepositories.get(0);
     }
 
     /**
@@ -85,7 +88,7 @@ public class RegisterService {
         if (!isAvailable(userCount))   //check before get a lock
             throw new LimitReachedException(userCount);
 
-        final int newCount=increseUserCount(users);
+        final int newCount=increseUserCount(users.size());
         final LocalDateTime now=LocalDateTime.now();
         pool.submit(()->
         {
@@ -96,6 +99,39 @@ public class RegisterService {
             users.forEach(u->u.setId(newCount));
             registerRepositories.forEach(r->r.register(apply));
         }); //submit apply request
+    }
+
+    public Apply update(Apply apply){
+
+        Apply old=registerRepository.get(apply.getId());
+        int oldSize=old.getAttendees().size();
+        int newSize=apply.getAttendees().size();
+
+        if (oldSize > newSize){
+            decreaseUserCount(oldSize - newSize);
+        }else if (oldSize < newSize){
+            increseUserCount(newSize - oldSize);
+        }
+
+        pool.submit(()->registerRepositories.forEach(r->r.update(apply)));
+
+        return old;
+
+    }
+
+    public Apply getApply(int id){
+        return registerRepository.get(id);
+    }
+
+    public Apply remove(int id){
+
+        Apply apply=registerRepository.get(id);
+        if (apply == null)
+            throw new LimitReachedException();
+
+        decreaseUserCount(apply.getAttendees().size());
+        pool.submit(()->registerRepositories.forEach(r->r.remove(id)));
+        return apply;
     }
 
     /**
@@ -111,16 +147,17 @@ public class RegisterService {
      * @return
      */
     public List<Apply> getApplies(){
-        return registerRepositories.get(0).getList(); // Uses Cached List
+        return registerRepository.getList(); // Uses Cached List
     }
+
 
     /**
      * Increase Applied User Count
      * 3 operations should be synchronized
-     * @param users
+     * @param userCount
      */
-    private synchronized int increseUserCount(List<User> users){
-        int userCount=users.size();
+    private synchronized int increseUserCount(int userCount){
+
         if (!isAvailable(userCount)) //check again after get a lock
             throw new LimitReachedException(userCount);
         count+=userCount;
@@ -129,6 +166,14 @@ public class RegisterService {
             isFull=true;
         }
         return count;
+    }
+
+    private synchronized int decreaseUserCount(int count){
+        this.count-=count;
+
+        if (isFull)
+            isFull=false;
+        return this.count;
     }
 
 

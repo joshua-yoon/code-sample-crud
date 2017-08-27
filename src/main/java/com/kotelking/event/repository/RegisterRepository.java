@@ -7,7 +7,10 @@ import java.util.List;
 
 public interface RegisterRepository {
 
-    boolean register(Apply apply);
     List<Apply> getList();
+    boolean register(Apply apply);
+    Apply get(int id);
+    Apply remove(int id);
+    Apply update(Apply apply);
 
 }

@@ -8,8 +8,6 @@ public class User implements Serializable{
     private String name;
     private String phone;
     private String email;
-    private Gender gender;
-    private int age;
 
     public int getId() {
         return id;
@@ -43,19 +41,4 @@ public class User implements Serializable{
         this.email = email;
     }
 
-    public Gender getGender() {
-        return gender;
-    }
-
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
 }

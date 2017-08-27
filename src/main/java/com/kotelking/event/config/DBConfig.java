@@ -1,5 +1,6 @@
 package com.kotelking.event.config;
 
+import com.kotelking.event.repository.MockSession;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.ibatis.session.SqlSession;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -198,6 +199,6 @@ public class DBConfig {
             LOG.error("failed to make a SQL session.", e);
         }
 
-        return null;
+        return new MockSession();
     }
 }

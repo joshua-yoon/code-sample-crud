@@ -18,10 +18,10 @@ public class DbRepository implements RegisterRepository{
     private SqlSession registerSession;
 
 
-    @Autowired
-    public void setSession(@Qualifier(DBConfig.DBTargets.REGISTER) SqlSession sqlSession){
-        registerSession=sqlSession;
-    }
+//    @Autowired
+//    public void setSession(@Qualifier(DBConfig.DBTargets.REGISTER) SqlSession sqlSession){
+//        registerSession=sqlSession;
+//    }
 
     private SqlSession getSession(){
 
@@ -31,13 +31,28 @@ public class DbRepository implements RegisterRepository{
     }
 
     @Override
-    @Transactional
     public boolean register(Apply apply) {
 
         int count=getSession().insert("register",apply);
         apply.getAttendees().forEach(a->getSession().insert("addUser",a));
 
         return count > 0;
+    }
+
+    @Override
+    public Apply get(int id) {
+        return new Apply();
+    }
+
+
+    @Override
+    public Apply remove(int id) {
+        return new Apply();
+    }
+
+    @Override
+    public Apply update(Apply apply) {
+        return apply;
     }
 
     @Override

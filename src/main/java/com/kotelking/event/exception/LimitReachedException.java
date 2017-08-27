@@ -1,4 +1,4 @@
-package com.kotelking.event;
+package com.kotelking.event.exception;
 
 public class LimitReachedException extends RuntimeException {
 

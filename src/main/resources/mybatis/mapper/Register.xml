@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Register">
+
+    <!--Register New Apply -->
+    <insert id="register" parameterType="com.kotelking.event.model.Apply">
+        INSERT INTO apply set id, registered_date values (#{id},#{registered_date})
+    </insert>
+
+    <!--Add User info -->
+    <insert id="addUser" parameterType="com.kotelking.event.model.User">
+        INSERT INTO user_info SET id, name, phone, email, gender, age values (#{id},#{name},#{phone},#{email},#{gender},#age)
+    </insert>
+
+
+    <!--Registered List-->
+    <select id="getApplies" resultType="com.kotelking.event.model.Apply">
+        SELECT * from apply limit 100
+    </select>
+
+    <!--User Info-->
+    <select id="getUsers" parameterType="int" resultMap="com.kotelking.event.model.User">
+        SELECT * from user_info where id=${id} limit 100
+    </select>
+
+</mapper>

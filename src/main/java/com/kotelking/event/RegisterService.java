@@ -29,43 +29,15 @@ public class RegisterService {
 
     public static final int MAX = 100;
 
-    private static final int THREAD_POOL_MIN_CORE_SIZE = 4;
-    private static final int THREAD_POOL_MAX_SIZE = 24;
-    private ThreadPoolTaskExecutor pool;
-    private final List<RegisterRepository> registerRepositories;
+
     private final RegisterRepository registerRepository;
 
     @Autowired
-    public RegisterService(@Qualifier(RepositoryConfig.REPOSITORY_LIST) List<RegisterRepository> registerRepositories){
+    public RegisterService(@Qualifier(RepositoryConfig.MULTI) RegisterRepository registerRepository){
 
-        this.registerRepositories=registerRepositories;
-        this.registerRepository=registerRepositories.get(0);
+        this.registerRepository=registerRepository;
     }
 
-    /**
-     * Initialize thread pool
-     * determine pool size by available processors
-     * however it should considered by SQL server connection size
-     *
-     * @throws Exception
-     */
-    @PostConstruct
-    public void init(){
-        int maxPoolSize = Runtime.getRuntime().availableProcessors();
-        int corePoolSize = 0;
-        if (maxPoolSize < 1) {
-            maxPoolSize = THREAD_POOL_MAX_SIZE;
-        }
-        corePoolSize = maxPoolSize / 2; //half
-        if (corePoolSize < THREAD_POOL_MIN_CORE_SIZE) {
-            corePoolSize = THREAD_POOL_MIN_CORE_SIZE;
-        }
-        pool = new ThreadPoolTaskExecutor();
-        pool.setCorePoolSize(corePoolSize);
-        pool.setMaxPoolSize(maxPoolSize);
-        pool.setWaitForTasksToCompleteOnShutdown(true);
-        pool.initialize();
-    }
 
     /**
      * User Count check if it is available
@@ -90,15 +62,12 @@ public class RegisterService {
 
         final int newCount=increseUserCount(users.size());
         final LocalDateTime now=LocalDateTime.now();
-        pool.submit(()->
-        {
-            Apply apply=new Apply();
-            apply.setId(newCount);
-            apply.setAttendees(users);
-            apply.setAppliedTime(now);
-            users.forEach(u->u.setId(newCount));
-            registerRepositories.forEach(r->r.register(apply));
-        }); //submit apply request
+        Apply apply=new Apply();
+        apply.setId(newCount);
+        apply.setAttendees(users);
+        apply.setAppliedTime(now);
+        users.forEach(u->u.setId(newCount));
+        registerRepository.register(apply);
     }
 
     public Apply update(Apply apply){
@@ -112,9 +81,7 @@ public class RegisterService {
         }else if (oldSize < newSize){
             increseUserCount(newSize - oldSize);
         }
-
-        pool.submit(()->registerRepositories.forEach(r->r.update(apply)));
-
+        registerRepository.update(apply);
         return old;
 
     }
@@ -130,7 +97,7 @@ public class RegisterService {
             throw new LimitReachedException();
 
         decreaseUserCount(apply.getAttendees().size());
-        pool.submit(()->registerRepositories.forEach(r->r.remove(id)));
+        registerRepository.remove(id);
         return apply;
     }
 

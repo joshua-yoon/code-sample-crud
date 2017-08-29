@@ -4,9 +4,9 @@
 
 <mapper namespace="Register">
 
-    <!--Register New Apply -->
-    <insert id="register" parameterType="com.kotelking.event.model.Apply">
-        INSERT INTO apply set id, registered_date values (#{id},#{registered_date})
+    <!--Register New Application -->
+    <insert id="register" parameterType="com.kotelking.event.model.Application">
+        INSERT INTO application set id, registered_date values (#{id},#{registered_date})
     </insert>
 
     <!--Add User info -->
@@ -16,8 +16,8 @@
 
 
     <!--Registered List-->
-    <select id="getApplies" resultType="com.kotelking.event.model.Apply">
-        SELECT * from apply limit 100
+    <select id="getApplies" resultType="com.kotelking.event.model.Application">
+        SELECT * from application limit 100
     </select>
 
     <!--User Info-->

@@ -1,13 +1,9 @@
 package com.kotelking.event.repository;
 
-import com.kotelking.event.config.DBConfig;
-import com.kotelking.event.model.Apply;
+import com.kotelking.event.model.Application;
 import com.kotelking.event.model.User;
 import org.apache.ibatis.session.SqlSession;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,7 +13,7 @@ public class DbRepository implements RegisterRepository{
     private final SqlSession mockSession=new MockSession();
     private SqlSession registerSession;
 
-
+// Comment out for a test
 //    @Autowired
 //    public void setSession(@Qualifier(DBConfig.DBTargets.REGISTER) SqlSession sqlSession){
 //        registerSession=sqlSession;
@@ -31,33 +27,33 @@ public class DbRepository implements RegisterRepository{
     }
 
     @Override
-    public boolean register(Apply apply) {
+    public boolean register(Application application) {
 
-        int count=getSession().insert("register",apply);
-        apply.getAttendees().forEach(a->getSession().insert("addUser",a));
+        int count=getSession().insert("register", application);
+        application.getAttendees().forEach(a->getSession().insert("addUser",a));
 
         return count > 0;
     }
 
     @Override
-    public Apply get(int id) {
-        return new Apply();
+    public Application get(int id) {
+        return new Application();
     }
 
 
     @Override
-    public Apply remove(int id) {
-        return new Apply();
+    public Application remove(int id) {
+        return new Application();
     }
 
     @Override
-    public Apply update(Apply apply) {
-        return apply;
+    public Application update(Application application) {
+        return application;
     }
 
     @Override
-    public List<Apply> getList() {
-        return getSession().selectList("getApplies");
+    public List<Application> getList() {
+        return getSession().selectList("getApplications");
     }
 
     public List<User> getUsers(int applyNo){

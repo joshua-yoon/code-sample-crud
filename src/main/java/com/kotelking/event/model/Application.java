@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class Apply implements Serializable {
+public class Application implements Serializable {
 
     private LocalDateTime appliedTime;
 
@@ -36,12 +36,15 @@ public class Apply implements Serializable {
         this.id = id;
     }
 
-    public static Apply makeNew(List<User> attendees){
+    public static Application makeNew(int id, List<User> attendees){
 
-        Apply newApply=new Apply();
-        newApply.setAttendees(attendees);
-        newApply.setAppliedTime(LocalDateTime.now());
-        return newApply;
+        attendees.forEach(u->u.setId(id));
+
+        Application newApplication =new Application();
+        newApplication.setId(id);
+        newApplication.setAttendees(attendees);
+        newApplication.setAppliedTime(LocalDateTime.now());
+        return newApplication;
 
     }
 }

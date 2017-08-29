@@ -1,7 +1,7 @@
 package com.kotelking.event.repository;
 
 import com.kotelking.event.config.RepositoryConfig;
-import com.kotelking.event.model.Apply;
+import com.kotelking.event.model.Application;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Repository;
@@ -52,30 +52,30 @@ public class MultiRepository implements RegisterRepository{
 
 
     @Override
-    public List<Apply> getList() {
+    public List<Application> getList() {
         return priorityRepository.getList();
     }
 
     @Override
-    public boolean register(Apply apply) {
-        pool.submit(()->registerRepositories.forEach(r->r.register(apply)));
+    public boolean register(Application application) {
+        pool.submit(()->registerRepositories.forEach(r->r.register(application)));
         return true;
     }
 
     @Override
-    public Apply get(int id) {
+    public Application get(int id) {
         return priorityRepository.get(id);
     }
 
     @Override
-    public Apply remove(int id) {
+    public Application remove(int id) {
         pool.submit(()->registerRepositories.forEach(r->r.remove(id)));
         return null;
     }
 
     @Override
-    public Apply update(Apply apply) {
-        pool.submit(()->registerRepositories.forEach(r->r.update(apply)));
+    public Application update(Application application) {
+        pool.submit(()->registerRepositories.forEach(r->r.update(application)));
         return null;
     }
 }

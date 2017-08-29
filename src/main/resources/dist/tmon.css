@@ -1,0 +1,150 @@
+@import url('https://fonts.googleapis.com/css?family=Noto+Serif:400,400i,700,700i');
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600,600i');
+@import url('https://fonts.googleapis.com/css?family=Patua+One');
+@import url('https://fonts.googleapis.com/css?family=Share+Tech+Mono');
+/*@import url('https://fonts.googleapis.com/css?family=Signika:400,600');*/
+@import url('https://fonts.googleapis.com/css?family=Comfortaa');
+/*@import url('https://fonts.googleapis.com/css?family=Oxygen');*/
+@import url('https://fonts.googleapis.com/css?family=Roboto+Mono:400,400i,700,700i');
+
+#swagger-ui-container {
+
+}
+
+.swagger-section #header {
+	background-color: #ffd20f;
+	text-shadow: 0 1px 0 #b8b8b8;
+}
+
+.logo__title {
+	color: black !important;
+	font-weight: normal;
+}
+
+#api_info {
+	background-color: #f5f5f5;
+	padding: 1.4em;
+	border-radius: 0.8em;
+	margin-bottom: 2em;
+}
+
+#api_info a, .info_name {
+	font-family: 'Patua One', cursive !important;
+}
+
+.info_title, .info_description, .logo__title {
+	font-family: 'Patua One', cursive !important;
+}
+
+.info_title {
+	color: #1d1d1d;
+	text-shadow: 0 1px 3px #cccccc;
+	font-size: 1.3em !important;
+}
+
+.info_description {
+	color: gray !important;
+	text-shadow: 0 1px 0 white;
+}
+
+.info_email {
+	margin-top: 1em;
+}
+
+.content {
+	font-family: "Open Sans", sans-serif;
+}
+
+.http_method {
+	font-family: 'Comfortaa', cursive;
+	font-weight: bold;
+}
+
+.path {
+	font-family: 'Open Sans', sans-serif;
+	font-weight: bold;
+	text-shadow: 0 1px 0 white;
+	font-size: 0.9em;
+	font-style: italic !important;
+}
+
+/* API description */
+.heading h2 {
+	/*font-family: 'Noto Serif', serif !important;*/
+	color: #103468 !important;
+	font-family: "Open Sans", sans-serif !important;
+	font-size: 0.9em !important;
+	/*font-style: italic;*/
+}
+
+.heading h2 a {
+	font-style: normal;
+	font-family: 'Noto Serif', serif !important;
+}
+
+#header .swagger-ui-wrap {
+	margin-left: 0;
+	margin-right: 0;
+}
+
+.logo__title {
+	color: #ffffff;
+}
+
+.options li {
+	text-shadow: 0 1px 0 white;
+	font-family: 'Oxygen', sans-serif;
+}
+
+.parameters {
+	text-shadow: 0 1px 0 white;
+	font-family: 'Share Tech Mono', sans-serif;
+}
+
+/* API description */
+.heading .markdown p {
+	font-size: 1.1em;
+	font-variant: normal;
+	font-family: 'Noto Serif', serif;
+	/* rounded font */
+	/*font-family: 'Oxygen', sans-serif;*/
+	font-style: italic;
+	/*font-weight: bold;*/
+}
+
+/* Implementation Notes and Parameter description */
+.content .markdown p {
+	font-size: 0.9em;
+	font-style: normal;
+	font-family: "Open Sans", sans-serif;
+	font-weight: bold;
+}
+
+.sandbox_header .submit {
+	border: none;
+	border-radius: 4px;
+	background-color: #333052;
+	color: white;
+	font-size: 1em;
+	margin-top: 2em;
+	font-family: 'Share Tech Mono', sans-serif;
+}
+
+code {
+	font-family: 'Roboto Mono', monospace;
+}
+
+a:link {
+	text-decoration: none;
+}
+
+a:hover {
+	color: #d8384e !important;
+	text-decoration: none;
+}
+
+.footer {
+	padding-top: 1em;
+	font-size: 0.8em;
+	font-family: 'Comfortaa', cursive;
+}

@@ -1,6 +1,6 @@
 package com.kotelking.event.repository;
 
-import com.kotelking.event.model.Apply;
+import com.kotelking.event.model.Application;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -16,33 +16,33 @@ import java.util.concurrent.ConcurrentHashMap;
 public class LocalRepository implements RegisterRepository {
 
 
-    private Map<Integer,Apply> innerRepository=new ConcurrentHashMap<>();
+    private Map<Integer,Application> innerRepository=new ConcurrentHashMap<>();
 
     /**
      * Register Users in memory list
-     * @param apply
+     * @param application
      * @return
      */
     @Override
-    public boolean register(Apply apply) {
+    public boolean register(Application application) {
 
-        innerRepository.put(apply.getId(),apply);
+        innerRepository.put(application.getId(), application);
         return true;
     }
 
     @Override
-    public Apply get(int id) {
+    public Application get(int id) {
         return innerRepository.get(id);
     }
 
     @Override
-    public Apply remove(int id) {
+    public Application remove(int id) {
         return innerRepository.remove(id);
     }
 
     @Override
-    public Apply update(Apply apply) {
-        return innerRepository.put(apply.getId(),apply);
+    public Application update(Application application) {
+        return innerRepository.put(application.getId(), application);
     }
 
     /**
@@ -50,7 +50,7 @@ public class LocalRepository implements RegisterRepository {
      * @return
      */
     @Override
-    public List<Apply> getList() {
+    public List<Application> getList() {
         return Collections.unmodifiableList(new ArrayList<>(innerRepository.values()));
     }
 }

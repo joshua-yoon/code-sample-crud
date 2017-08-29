@@ -1,17 +1,20 @@
 package com.kotelking.event;
 
-import com.kotelking.event.exception.LimitReachedException;
-import com.kotelking.event.model.Apply;
+import com.kotelking.event.exception.ApiException;
+import com.kotelking.event.model.Application;
 import com.kotelking.event.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@RequestMapping("applications")
 @RestController
 public class RegisterController {
 
     private final RegisterService registerService;
+
 
     @Autowired
     public RegisterController(RegisterService registerService){
@@ -19,54 +22,67 @@ public class RegisterController {
     }
 
 
-    @RequestMapping(method= RequestMethod.GET,value="applies")
-    public List<Apply> getList(){
+    /**
+     * Get applied list
+     * @return
+     */
+    @RequestMapping(method= RequestMethod.GET)
+    public List<Application> getList(){
 
-        return registerService.getApplies();
+        return registerService.getApplications();
     }
 
     /**
-     * Register on list (Create Item)
+     * Register on list (Create)
      * @param users
      * @return
      */
-    @RequestMapping(method= RequestMethod.POST,value="applies")
-    public String register(List<User> users){
+    @RequestMapping(method= RequestMethod.POST)
+    public Application register(List<User> users){
 
-        registerService.register(users);
-        return "신청되었습니다";
-    }
-
-    @RequestMapping(method= RequestMethod.GET,value="applies/{id}")
-    public Apply getApply(@PathVariable("id") int id){
-        return registerService.getApply(id);
+        return registerService.register(users);
     }
 
     /**
-     * Update
-     * @param apply
-     * @return
-     */
-    @RequestMapping(method= RequestMethod.PUT,value="applies/{id}")
-    public Apply update(@PathVariable("id") int id, Apply apply){
-        if (id != apply.getId())
-            throw new RuntimeException();
-        return registerService.update(apply);
-    }
-
-    /**
-     * Delete
+     * Gets an application for id
      * @param id
      * @return
      */
-    @RequestMapping(method= RequestMethod.DELETE,value="applies/{id}")
-    public Apply delete(@PathVariable("id") int id){
-        return registerService.remove(id);
+    @RequestMapping(method= RequestMethod.GET,value="{id}")
+    public Application getApply(@PathVariable("id") int id){
+        return registerService.getApplication(id);
     }
 
-    @ExceptionHandler(LimitReachedException.class)
-    public String limitReached(LimitReachedException e){
-        return e.getMessage();
+    /**
+     * Update Application
+     * @param application
+     * @return
+     */
+    @RequestMapping(method= RequestMethod.PUT,value="{id}")
+    public Application update(@PathVariable("id") int id, Application application){
+        if (id != application.getId())
+            throw new RuntimeException();
+        return registerService.update(application);
+    }
+
+    /**
+     * Delete Application
+     * @param id
+     * @return
+     */
+    @RequestMapping(method= RequestMethod.DELETE,value="{id}")
+    public Application delete(@PathVariable("id") int id){
+        return registerService.delete(id);
+    }
+
+    /**
+     * ApiException Handler
+     * @param e
+     * @return
+     */
+    @ExceptionHandler(ApiException.class)
+    public ResponseEntity<String> exception(ApiException e){
+        return new ResponseEntity<>(e.getMessage(),e.getHttpStatus());
     }
 
 }

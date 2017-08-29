@@ -1,9 +1,8 @@
-package com.kotelking.event.config;
+package com.kotelking.event;
 
-import com.kotelking.event.AppConfig;
-import com.kotelking.event.exception.LimitReachedException;
-import com.kotelking.event.model.Apply;
-import com.kotelking.event.RegisterService;
+import com.kotelking.event.config.RepositoryConfig;
+import com.kotelking.event.exception.ApiException;
+import com.kotelking.event.model.Application;
 import com.kotelking.event.model.User;
 import org.junit.Assert;
 import org.junit.Before;
@@ -12,6 +11,7 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -41,15 +41,22 @@ public class RegisterTest {
         assertNotNull(registerService);
     }
 
+    private List<User> makeUsers(int count){
+        List<User> userList= new ArrayList<>();
+        for (int i=0;i<count;i++){
+            userList.add(new User());
+        }
+        return userList;
+    }
+
     @Test
     public void serialRegister(){
-        List<User> userList=new ArrayList<>();
-        userList.add(new User());
+        List<User> userList=makeUsers(1);
         IntStream.iterate(0,i->i++)
                 .limit(TEST_MORE)
                 .forEach(i->unitRegister(userList));
         assertEquals(TEST_MAX,registerService.getCount());
-        assertEquals(TEST_MAX,registerService.getApplies().size());
+        assertEquals(TEST_MAX,registerService.getApplications().size());
     }
 
     @Test
@@ -57,37 +64,26 @@ public class RegisterTest {
         makeRandomApply().parallelStream().forEach(
                 a->unitRegister(a.getAttendees()));
         assertEquals(TEST_MAX,registerService.getCount());
-        assertEquals(TEST_MAX,registerService.getApplies().size());
+        assertEquals(TEST_MAX,registerService.getApplications().size());
     }
 
     @Test
     public void updateTest(){
         serialRegister();
-
-        List<User> users=new ArrayList<>(); // 2 people update
-        users.add(new User());
-
-        Apply apply=new Apply();
-        apply.setId(1);
-        apply.setAttendees(users);
-        registerService.update(apply);
+        registerService.update(Application.makeNew(1,makeUsers(1)));
     }
-
 
     @Test
     public void updateOverLimit(){
         serialRegister(); // Max 100, each 1 person register
 
-        List<User> users=new ArrayList<>(); // 2 people update
-        users.add(new User());
-        users.add(new User());
+        Application application = Application.makeNew(1,makeUsers(2)); // id : 1 , 2 people
 
-        Apply apply=new Apply();
-        apply.setId(1);
-        apply.setAttendees(users);
         try {
-            registerService.update(apply);
-        }catch (LimitReachedException e){
+            registerService.update(application);
+        }catch (ApiException e){
+            LOGGER.debug("{}",e);
+             Assert.assertEquals(HttpStatus.BAD_REQUEST,e.getHttpStatus());
             return;
         }
         Assert.fail();
@@ -102,13 +98,13 @@ public class RegisterTest {
         int deleteCount=random.nextInt(count);
 
         LOGGER.debug("current count {} deleteCount {}",count, deleteCount);
-        LOGGER.debug("applies count {}",registerService.getApplies().size());
-        registerService.getApplies()
+        LOGGER.debug("applies count {}",registerService.getApplications().size());
+        registerService.getApplications()
                 .stream().limit(deleteCount).forEach(a->{
 
 
                 LOGGER.debug("id {}",a.getId());
-                registerService.remove(a.getId());
+                registerService.delete(a.getId());
                 }
         );
 
@@ -117,20 +113,31 @@ public class RegisterTest {
     }
 
     @Test
+    public void deleteFailTest(){
+        try {
+            registerService.delete(Integer.MAX_VALUE);
+        }catch (ApiException e){
+            Assert.assertEquals(HttpStatus.NOT_FOUND,e.getHttpStatus());
+            return;
+        }
+        Assert.fail();
+    }
+
+    @Test
     public void randomCheckId(){
         serialRegister();
         int count=registerService.getCount();
         Random random=new Random();
 
-        List<Apply> applyList=registerService.getApplies();
+        List<Application> applicationList =registerService.getApplications();
         IntStream.iterate(0,i->i++).limit(count)
                 .parallel()
                 .forEach(x->{
                     int savedId=random.nextInt(count);
-                    Apply savedApply=applyList.get(savedId);
-                    int checkId=savedApply.getId();
-                    Apply checkApply=registerService.getApply(checkId);
-                    Assert.assertEquals(savedApply,checkApply);
+                    Application savedApplication = applicationList.get(savedId);
+                    int checkId= savedApplication.getId();
+                    Application checkApplication =registerService.getApplication(checkId);
+                    Assert.assertEquals(savedApplication, checkApplication);
 
                 });
     }
@@ -144,23 +151,15 @@ public class RegisterTest {
     }
 
     private List<User> makeRandomUsers(){
-        List<User> userList=new ArrayList<>();
+
         Random random=new Random();
-        IntStream.iterate(0,i->i++).limit(random.nextInt(1)+1)
-                .forEach(i->userList.add(new User()));
-        return userList;
+        return makeUsers(random.nextInt(2));
     }
 
-    private List<Apply> makeRandomApply(){
-        List<Apply> applies=new ArrayList<>();
+    private List<Application> makeRandomApply(){
+        List<Application> applies=new ArrayList<>();
         IntStream.iterate(0,i->i++).limit(TEST_MORE)
-                .forEach(
-                        a->{
-                            Apply apply=new Apply();
-                            apply.setAttendees(makeRandomUsers());
-                            applies.add(apply);
-                        }
-                );
+                .forEach(id-> Application.makeNew(id,makeRandomUsers()));
         return applies;
     }
 
